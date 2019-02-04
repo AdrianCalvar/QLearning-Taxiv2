@@ -16,7 +16,7 @@ qtable = np.zeros((state_size, action_size))
 print(qtable)
 
 # Hyperparameters
-total_episodes = 200000
+total_episodes = 20000
 total_test_episodes = 100
 max_steps = 79  # Max steps per episode
 
@@ -43,8 +43,8 @@ for episode in range(total_episodes):
             action = env.action_space.sample()
         new_state, reward, done, info = env.step(action)
         # Update Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]
-        qtable[state, action] = qtable[state, action] + learning_rate *
-
+        qtable[state, action] = qtable[state, action] + learning_rate * (reward + gamma *
+                                                                         np.max(qtable[new_state, :]) - qtable[state, action])
         state = new_state
         if done == True:
             break
