@@ -16,17 +16,19 @@ qtable = np.zeros((state_size, action_size))
 print(qtable)
 
 # Hyperparameters
-total_episodes = 20000
+
+total_episodes      = 2000
 total_test_episodes = 100
-max_steps = 79  # Max steps per episode
+max_steps           = 79  # Max steps per episode
 
-learning_rate = 0.5
-gamma = 0.818  # Discounting rate
+learning_rate       = 0.5
+gamma               = 0.818  # Discounting rate
 
-epsilon = 1.0  # Exploration rate
-max_epsilon = 1.0  # Exploration probability at start
-min_epsilon = 0.01  # Exploration probablity at ending
-decay_rate = 0.01  # Exponential decay rate for the exploration probability
+epsilon             = 1.0  # Exploration rate
+max_epsilon         = 1.0  # Exploration probability at start
+min_epsilon         = 0.01  # Exploration probablity at ending
+# Exponential decay rate for the exploration probability
+decay_rate          = 0.01
 
 for episode in range(total_episodes):
     state = env.reset()
@@ -35,30 +37,34 @@ for episode in range(total_episodes):
 
     for step in range(max_steps):
         exp_tradeoff = random.uniform(0, 1)
-
         # Explotation vs exploration
-        if exp_tradeoff > epsilon:
+        if exp_tradeoff > epsilon: # Explotation
             action = np.argmax(qtable[state, :])
         else:
-            action = env.action_space.sample()
+            action = env.action_space.sample() # Exploration
+
         new_state, reward, done, info = env.step(action)
         # Update Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]
-        qtable[state, action] = qtable[state, action] + learning_rate * (reward + gamma *
-                                                                         np.max(qtable[new_state, :]) - qtable[state, action])
+        qtable[state, action] = qtable[state, action] + learning_rate * \
+                                (
+                                    reward
+                                    + gamma * np.max(qtable[new_state, :]) \
+                                    - qtable[state, action]
+                                )
         state = new_state
         if done == True:
             break
 
-    epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(-decay_rate * episode)
-
+    epsilon = min_epsilon \
+            +(max_epsilon - min_epsilon) * np.exp(-decay_rate * episode)
 
 env.reset()
 rewards = []
 
 for episode in range(total_test_episodes):
-    state = env.reset()
-    step = 0
-    done = False
+    state         = env.reset()
+    step          = 0
+    done          = False
     total_rewards = 0
     print("****************************************************")
     print("EPISODE ", episode)
@@ -67,11 +73,10 @@ for episode in range(total_test_episodes):
     for step in range(max_steps):
         # UNCOMMENT IT IF YOU WANT TO SEE OUR AGENT PLAYING
         env.render()
-        # Take the action (index) that have the maximum expected future reward given that state
+        # Take the action (index) that have the maximum expected future reward
+        # given that state
         action = np.argmax(qtable[state, :])
-
         new_state, reward, done, info = env.step(action)
-
         total_rewards += reward
 
         if done:
